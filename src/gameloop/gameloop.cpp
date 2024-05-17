@@ -27,11 +27,8 @@ bool GameLoop::isRunning() noexcept {
 }
 
 void GameLoop::Start(zmq::socket_t& subscriber) {
-    if (!isRunning()) {
-        gLInstance->m_running = true;
-        zmq::pollitem_t items[] = { { static_cast<void*>(subscriber), 0, ZMQ_POLLIN, 0 } };
-        Run(items, subscriber);
-    }
+    zmq::pollitem_t items[] = { { static_cast<void*>(subscriber), 0, ZMQ_POLLIN, 0 } };
+    Run(items, subscriber);
 }
 
 void GameLoop::Update() {
@@ -49,15 +46,13 @@ void GameLoop::Stop() {
 }
 
 void GameLoop::Run(zmq::pollitem_t* items, zmq::socket_t& subscriber) {
-    
+    subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
     while (isRunning()) {
         reset_loop_start();
-        // Game loop
-        // ...
         zmq::poll(&items[0], 1, std::chrono::milliseconds(0));    
         if (items[0].revents & ZMQ_POLLIN) {
             zmq::message_t message;
-            if (subscriber.recv(message, zmq::recv_flags::dontwait)) {
+            if (subscriber.recv(message)) {
                 read_buffer.push_back(std::move(message));
             }
         }
