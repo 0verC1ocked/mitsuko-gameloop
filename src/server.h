@@ -14,3 +14,6 @@
 #include "../inc/zmq.hpp"
 #include "utils/logger/logger.h"
 #include "gameloop/gameloop.h"
+#include "../lib/payloadbuilder/inc/payload-builder.h"
+#include "../lib/payloadbuilder/src/proto/payload.pb.h"
+#include "constants.h"

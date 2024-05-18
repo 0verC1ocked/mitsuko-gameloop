@@ -32,9 +32,12 @@ void GameLoop::Start(zmq::socket_t& subscriber) {
 }
 
 void GameLoop::Update() {
+    PayloadBuilder pb;
     for (const zmq::message_t& msg : read_buffer) {
+        PAYLOAD::Payload *serialized_payload = pb.newPayload();
         std::string payload(static_cast<const char*>(msg.data()), msg.size());
-        std::cout << "Received message: " << payload << std::endl;
+        serialized_payload->ParseFromString(payload);
+        Logger::Log(INFO, "Received payload: " + serialized_payload->ShortDebugString());
     }
     read_buffer.clear();
 }
@@ -49,7 +52,7 @@ void GameLoop::Run(zmq::pollitem_t* items, zmq::socket_t& subscriber) {
     subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
     while (isRunning()) {
         reset_loop_start();
-        zmq::poll(&items[0], 1, std::chrono::milliseconds(0));    
+        zmq::poll(&items[0], 1, std::chrono::milliseconds(0));
         if (items[0].revents & ZMQ_POLLIN) {
             zmq::message_t message;
             if (subscriber.recv(message)) {
@@ -60,7 +63,13 @@ void GameLoop::Run(zmq::pollitem_t* items, zmq::socket_t& subscriber) {
         Update();
         
         dt = get_loop_elapsed_time();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
+        
+        if (dt < GAME_LOOP_TIME) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(GAME_LOOP_TIME - dt));
+        } else if (dt > GAME_LOOP_TIME) {
+            Logger::Log(ALERT, "Game loop is running behind by " + std::to_string(dt - GAME_LOOP_TIME) + "ms");
+            std::this_thread::sleep_for(std::chrono::milliseconds(GAME_LOOP_TIME - (dt - GAME_LOOP_TIME)));
+        }
     }
 }
 
