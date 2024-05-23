@@ -4,7 +4,7 @@ BUILD_DIR := ./build
 OBJ_DIR := $(BUILD_DIR)/obj
 SRC_DIR := ./src
 INC_DIR := ./inc
-LIBS := -lprotobuf -lpthread -lzmq -lenet
+LIBS := -lprotobuf -lpthread -lzmq
 
 # Find all submodule directories
 SUBMODULE_DIRS := $(shell find lib -maxdepth 1 -mindepth 1 -type d)
@@ -65,7 +65,7 @@ $(OBJ_DIR)/%.cc.o: %.cc
 	mkdir -p $(dir $@)
 	clang++ $(CPPFLAGS) $(CXXFLAGS) -I $(INC_DIR) -I $(SRC_DIR) -c $< -o $@
 
-$(PCH): $(HEADERS)
+$(PCH): $(HEADERS) $(PCH_FILENAME)
 	@echo "Building Precompiled Header..."
 	clang++ $(CXXFLAGS) -I $(INC_DIR) -I $(SRC_DIR) -x c++-header $(PCH_FILENAME)
 
