@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cstdint>
 #include <string>
 #include "bracket.h"
@@ -227,9 +228,9 @@ struct MatchModel {
   std::vector<Player> away_lineup;
   CurrentBall currentBall;
   std::vector<CurrentBall> previousBalls = {{}, {}, {}};
-  Player *selectedFirstBatsman;
-  Player *selectedSecondBatsman;
-  Player *selectedBowler;
+  std::unique_ptr<Player> selectedFirstBatsman;
+  std::unique_ptr<Player> selectedSecondBatsman;
+  std::unique_ptr<Player> selectedBowler;
   std::chrono::high_resolution_clock::time_point stateStartTime;
   std::chrono::high_resolution_clock::time_point both_disconnect_time_point;
   std::string winner = "";
@@ -386,7 +387,3 @@ struct MatchModel {
     return g_match_model_allocator->deallocate(ptr, size);
   }
 };
-
-
-
-

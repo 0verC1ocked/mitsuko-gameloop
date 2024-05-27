@@ -10,6 +10,7 @@
 #include <string>
 #include <chrono>
 #include <sys/time.h>
+#include <random>
 
 #include "gameloop/gameloop.h"
 #include "utils/logger/logger.h"
@@ -22,3 +23,11 @@
 #include "match-engine/configs/match-engine-config.h"
 
 #include "memory/pool-allocator.h"
+
+#include "match-manager/match-manager.h"
+
+#include "character-helper/character-helper.h"
+
+#include "match-engine/match-engine.h"
+
+#include "utils/functions/functions.h"

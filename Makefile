@@ -75,5 +75,7 @@ clean:
 cleanall:
 	rm -r $(BUILD_DIR)
 	$(foreach dir,$(SUBMODULE_DIRS), \
+		echo "Cleaning $(dir)"; \
+		cd $(dir); \
 		$(MAKE) -C $(dir) clean; \
 	)

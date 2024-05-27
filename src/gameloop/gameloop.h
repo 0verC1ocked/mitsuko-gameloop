@@ -30,10 +30,12 @@ private:
 
     static GameLoop* gLInstance;
     std::vector<zmq::message_t> read_buffer;
+
+    std::vector<std::string> serialized_p0_buffer;
+    std::vector<std::string> serialized_p1_buffer;
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> loop_start;
     
     long dt;
     void Run(zmq::pollitem_t* items, zmq::socket_t& subscriber);
     void Initialize() noexcept;
-
 };

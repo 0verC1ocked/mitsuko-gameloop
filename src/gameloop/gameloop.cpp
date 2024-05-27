@@ -34,10 +34,15 @@ void GameLoop::Start(zmq::socket_t& subscriber) {
 void GameLoop::Update() {
     PayloadBuilder pb;
     for (const zmq::message_t& msg : read_buffer) {
-        PAYLOAD::Payload *serialized_payload = pb.newPayload();
-        std::string payload(static_cast<const char*>(msg.data()), msg.size());
-        serialized_payload->ParseFromString(payload);
-        Logger::Log(INFO, "Received payload: " + serialized_payload->ShortDebugString());
+        Logger::Log(DEBUG, "Received message");
+        IPC::IPCMessage* ipcMessage = pb.newIPCMessage();
+        ipcMessage->ParseFromArray(msg.data(), msg.size());
+        if (ipcMessage->type() == IPC::IPCMessageType::IPC_CREATE_MATCH_REQUEST || ipcMessage->type() == IPC::IPCMessageType::IPC_P0_MATCH_REQUEST) {
+            serialized_p0_buffer.push_back(ipcMessage->data());
+        } else {
+            serialized_p1_buffer.push_back(ipcMessage->data());
+        }
+        Logger::Log(DEBUG, "Received message: " + ipcMessage->ShortDebugString());
     }
     read_buffer.clear();
 }
