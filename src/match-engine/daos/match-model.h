@@ -1,18 +1,19 @@
 #pragma once
+#include "../../../lib/payloadbuilder/src/proto/payload.pb.h"
+#include "../../memory/pool-allocator.h"
+#include "../configs/match-engine-config.h"
+#include "../configs/timeouts.h"
+#include "event-message.h"
+#include "ball.h"
+#include "bot.h"
+#include "bracket.h"
+#include "character.h"
+#include "match-states.h"
+#include "sa.h"
+#include "shot.h"
 #include <algorithm>
 #include <cstdint>
 #include <string>
-#include "bracket.h"
-#include "shot.h"
-#include "ball.h"
-#include "character.h"
-#include "sa.h"
-#include "bot.h"
-#include "../../../lib/payloadbuilder/src/proto/payload.pb.h"
-#include "../../memory/pool-allocator.h"
-#include "../configs/timeouts.h"
-#include "match-states.h"
-#include "../configs/match-engine-config.h"
 
 enum struct PlayStates { MatchMaked, Ready, Bowling, Batting, Forfiet, Crash };
 
@@ -40,7 +41,6 @@ enum struct ACK : int16_t {
   EndInnings,
   Reconnected,
 };
-
 
 enum struct Inning { First, Second };
 
@@ -131,9 +131,7 @@ struct UserInfo {
       this->last_disconnection_at = std::chrono::high_resolution_clock::now();
     }
   }
-  bool canSendPacket() {
-    return connectionState == ConnectionState::Connected;
-  }
+  bool canSendPacket() { return connectionState == ConnectionState::Connected; }
 };
 
 struct CurrentBall {
@@ -211,7 +209,8 @@ struct PlayersOnPitch {
   Player *bowler;
 };
 
-struct MatchModel {
+class MatchModel {
+public:
   MatchModel() {
     home_lineup.reserve(11);
     away_lineup.reserve(11);
@@ -243,6 +242,8 @@ struct MatchModel {
   std::chrono::high_resolution_clock::time_point second_join_at;
   bool canceled = false;
   bool is_ftue_match = false;
+
+  std::vector<EventMessage> message_buffer;
 
   bool has_reconnecting_client() {
     if (users[home].connectionState == ConnectionState::Reconnecting ||
@@ -311,27 +312,26 @@ struct MatchModel {
   bool isAwayDisconnected() {
     return users[away].connectionState == ConnectionState::Disconnected;
   }
-    
+
   int getStateTimeout() {
     if (is_ftue_match) {
-      return STATE_TIMEOUT_SECONDS * 3;//stateMachine.getCurrentStateTimeout() * 3;
+      return STATE_TIMEOUT_SECONDS *
+             3; // stateMachine.getCurrentStateTimeout() * 3;
     } else {
-      return STATE_TIMEOUT_SECONDS;//stateMachine.getCurrentStateTimeout();
+      return STATE_TIMEOUT_SECONDS; // stateMachine.getCurrentStateTimeout();
     }
   }
 
-  bool isStateExpired() {
-    return remainingStateSeconds() <= 0;
-  }
+  bool isStateExpired() { return remainingStateSeconds() <= 0; }
 
   int64_t remainingStateSeconds() {
-    return std::max(
-      0L,
-      getStateTimeout() - std::chrono::duration_cast<std::chrono::seconds>(
-        std::chrono::system_clock::now() - stateStartTime).count());
+    return std::max(0L,
+                    getStateTimeout() -
+                        std::chrono::duration_cast<std::chrono::seconds>(
+                            std::chrono::system_clock::now() - stateStartTime)
+                            .count());
   }
 
- 
   bool is_stale() {
     bool is_stale_timeout =
         std::chrono::duration_cast<std::chrono::seconds>(

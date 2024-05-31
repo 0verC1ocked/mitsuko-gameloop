@@ -23,6 +23,7 @@ public:
     static void Log(LogLevel level, const std::string& message, int color = -1);
     static void SetLogLevel(LogLevel level);
     static void printStartMessage();
+    static void printProgress(int numerator, int denominator);
 
 private:
     static std::string LevelToString(LogLevel level);

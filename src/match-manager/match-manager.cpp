@@ -48,7 +48,8 @@ void MatchManager::unpackPlayer(const PAYLOAD::Player& payloadPlayer, Player& pl
 
 
 void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
-    MatchModel* match = new (__FILE__, __LINE__) MatchModel();
+
+    MatchModel* match = new (__FILE__, __LINE__)MatchModel();
 
     std::string home_id = request->homeuserid();
     std::string away_id = request->awayuserid();
@@ -178,4 +179,34 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
     match->batsman_mana_required = batsman_mana_required;
     match->bowler_mana_required = bowler_mana_required;
     match->is_ftue_match = isFtueMatch;
+
+    m_matches.emplace(match->matchId, std::shared_ptr<MatchModel>(match));
+    Logger::Log(DEBUG, "Match created with ID: " + match->matchId);
+}
+
+bool MatchManager::pushIntoMatch(const std::string& serialized_data, const std::string& matchId) {
+    try {
+
+        if (matchId.empty()) {
+            Logger::Log(ERROR, "Match ID is empty");
+            return false;
+        }
+
+        // Find the match from the m_matches map
+        MatchModel* match = nullptr;
+        auto it = m_matches.find(matchId);
+        if (it != m_matches.end()) {
+            match = it->second.get();
+        } else {
+            Logger::Log(ERROR, "Match not found");
+            return false;
+        }
+
+        match->message_buffer.push_back(serialized_data);
+        return true;
+    } catch (const std::exception& e) {
+        Logger::Log(ERROR, "Encountered some issue with pushin data into buffer");
+        return false;
+    }
+    
 }

@@ -10,8 +10,6 @@
 class MatchManager {
     private:
         static MatchManager* m_instance;
-        // Unordered map from string to MatchModel pointers
-        std::unordered_map<std::string, std::shared_ptr<MatchModel>> m_matches;
         MatchManager();
     public: 
         static MatchManager* getInstance();
@@ -19,4 +17,9 @@ class MatchManager {
         static std::unique_ptr<Player> _dummy_player;
         void createMatch(const MATCH::CreateMatchRequest* request);
         void unpackPlayer(const PAYLOAD::Player& payloadPlayer, Player& player);
+        bool pushIntoMatch(const std::string& serialized_data, const std::string& match_id);
+        
+        // Unordered map from string to MatchModel pointers
+        std::unordered_map<std::string, std::shared_ptr<MatchModel>> m_matches;
+
 };

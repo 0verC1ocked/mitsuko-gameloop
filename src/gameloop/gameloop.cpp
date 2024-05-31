@@ -26,25 +26,60 @@ bool GameLoop::isRunning() noexcept {
     return gLInstance->m_running;
 }
 
-void GameLoop::Start(zmq::socket_t& subscriber) {
+void GameLoop::Start() {
     zmq::pollitem_t items[] = { { static_cast<void*>(subscriber), 0, ZMQ_POLLIN, 0 } };
-    Run(items, subscriber);
+
+    Run(items);
 }
 
 void GameLoop::Update() {
     PayloadBuilder pb;
     for (const zmq::message_t& msg : read_buffer) {
-        Logger::Log(DEBUG, "Received message");
         IPC::IPCMessage* ipcMessage = pb.newIPCMessage();
         ipcMessage->ParseFromArray(msg.data(), msg.size());
-        if (ipcMessage->type() == IPC::IPCMessageType::IPC_CREATE_MATCH_REQUEST || ipcMessage->type() == IPC::IPCMessageType::IPC_P0_MATCH_REQUEST) {
-            serialized_p0_buffer.push_back(ipcMessage->data());
-        } else {
-            serialized_p1_buffer.push_back(ipcMessage->data());
-        }
+        
         Logger::Log(DEBUG, "Received message: " + ipcMessage->ShortDebugString());
+        switch (ipcMessage->type()) {
+            case IPC::IPCMessageType::IPC_CREATE_MATCH_REQUEST: {
+                MATCH::CreateMatchRequest* createMatchRequest = pb.newCreateMatchRequest();
+                createMatchRequest->ParseFromString(ipcMessage->data());
+                MatchManager::getInstance()->createMatch(createMatchRequest);
+                break;
+            }
+            case IPC::IPCMessageType::IPC_P0_MATCH_REQUEST: { // Push into its own buffer
+                PAYLOAD::Payload* payload = pb.newPayload();
+                payload->ParseFromString(ipcMessage->data());
+                message_queue.push_back(EventMessage{ payload->SerializeAsString() });
+                break;
+            }
+            case IPC::IPCMessageType::IPC_P1_MATCH_REQUEST: { // Push into its own buffer
+                MatchManager::getInstance()->pushIntoMatch(ipcMessage->data(), ipcMessage->matchid());
+                break;
+            }
+            default:
+                break;
+        }
+
     }
     read_buffer.clear();
+
+    for (EventMessage& em : message_queue) {
+        PAYLOAD::Payload* payload = pb.newPayload();
+        payload->ParseFromString(em.message);
+        bool processed = EventHandler::getEventHandlerInstance()->handleEvent(pb, payload);
+        em.processed = processed;
+
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - em.created_at).count() > 7) {
+            Logger::Log(ERROR, "Message has expired!");
+            em.processed = true;
+        }
+    }
+
+    message_queue.erase(std::remove_if(message_queue.begin(), message_queue.end(), [](const EventMessage& em) {
+        return em.processed;
+    }), message_queue.end());
+
+    // Logger::printProgress(MatchManager::getInstance()->m_matches.size(), 100);
 }
 
 void GameLoop::Stop() {
@@ -53,7 +88,7 @@ void GameLoop::Stop() {
     }
 }
 
-void GameLoop::Run(zmq::pollitem_t* items, zmq::socket_t& subscriber) {
+void GameLoop::Run(zmq::pollitem_t* items) {
     subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
     while (isRunning()) {
         reset_loop_start();
@@ -66,7 +101,9 @@ void GameLoop::Run(zmq::pollitem_t* items, zmq::socket_t& subscriber) {
         }
 
         Update();
-        
+
+        processQueue();
+
         dt = get_loop_elapsed_time();
         
         if (dt < GAME_LOOP_TIME) {
@@ -88,4 +125,18 @@ long GameLoop::get_loop_elapsed_time() {
 
 GameLoop::~GameLoop() {
     ExitThread();
+}
+
+void GameLoop::queueData(const std::string& data) noexcept {
+    m_pub_queue.push_back(data);
+}
+
+void GameLoop::processQueue() noexcept {
+    for (const std::string& data : m_pub_queue) {
+        zmq::message_t message(data.size());
+        memcpy(message.data(), data.data(), data.size());
+        publisher.send(message);
+        Logger::Log(DEBUG, "Publishing data: " + data);
+    }
+    m_pub_queue.clear();
 }

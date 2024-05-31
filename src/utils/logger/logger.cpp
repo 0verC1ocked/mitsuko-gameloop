@@ -106,3 +106,18 @@ void Logger::printStartMessage() {
     std::cout << "\t\t\t░░░░▀▄▄░░░░░▀▀▀▀▀▀▀▀▀░░░░▄▄▀░░░░" << std::endl;
     std::cout << "\t\t\t░░░░░░░▀▀▀▄▄▄▄▄▄▄▄▄▄▄▄▀▀▀░░░░░░░" << std::endl;
 }
+
+void Logger::printProgress(int numerator, int denominator) {
+    std::cout << "[";
+    for (int i = 0; i < denominator; ++i) {
+        if (i < numerator) {
+            std::cout << "=";
+        } else if (i == numerator) {
+            std::cout << ">";
+        } else {
+            std::cout << " ";
+        }
+    }
+    std::cout << "] " << numerator << " " << denominator << "%\r";
+    std::cout.flush();
+}

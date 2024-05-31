@@ -12,13 +12,17 @@
 #include <sys/time.h>
 #include <random>
 
-#include "gameloop/gameloop.h"
 #include "utils/logger/logger.h"
+
 #include "../lib/payloadbuilder/inc/payload-builder.h"
+
 #include "../lib/payloadbuilder/src/proto/payload.pb.h"
+
 #include "config.h"
 
 #include "match-engine/daos/match-model.h"
+
+#include "gameloop/gameloop.h"
 
 #include "match-engine/configs/match-engine-config.h"
 
@@ -31,3 +35,5 @@
 #include "match-engine/match-engine.h"
 
 #include "utils/functions/functions.h"
+
+#include "event-handler/event-handler.h"
