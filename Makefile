@@ -1,4 +1,4 @@
-.PHONY: clean cleanall debug release
+.PHONY: clean cleanall debug release docs cleandocs
 
 BUILD_DIR := ./build
 OBJ_DIR := $(BUILD_DIR)/obj
@@ -37,7 +37,7 @@ sanitize: $(BUILD_DIR)/$(EXECUTABLE)
 release: CXXFLAGS += -O3 -fsanitize=address
 release: $(DEPS_LIBS) $(BUILD_DIR)/$(EXECUTABLE)
 
-releasedb: CXXFLAGS += -g -ggdb3 -O3
+releasedb: CXXFLAGS += -g -ggdb3 -O3 -fsanitize=address
 releasedb: $(BUILD_DIR)/$(EXECUTABLE)
 
 $(BUILD_DIR):
@@ -79,3 +79,9 @@ cleanall:
 		cd $(dir); \
 		$(MAKE) -C $(dir) clean; \
 	)
+
+cleandocs:
+	rm -r docs
+
+docs:
+	doxygen Doxyfile

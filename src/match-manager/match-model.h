@@ -1,16 +1,18 @@
 #pragma once
-#include "../../../lib/payloadbuilder/src/proto/payload.pb.h"
-#include "../../memory/pool-allocator.h"
-#include "../configs/match-engine-config.h"
-#include "../configs/timeouts.h"
-#include "event-message.h"
-#include "ball.h"
-#include "bot.h"
-#include "bracket.h"
-#include "character.h"
-#include "match-states.h"
-#include "sa.h"
-#include "shot.h"
+
+#include "../../lib/payloadbuilder/src/proto/payload.pb.h"
+#include "../memory/pool-allocator.h"
+#include "../match-engine/configs/match-engine-config.h"
+#include "../match-engine/configs/timeouts.h"
+#include "../match-engine/daos/event-message.h"
+#include "../match-engine/daos/ball.h"
+#include "../match-engine/daos/bot.h"
+#include "../match-engine/daos/bracket.h"
+#include "../match-engine/daos/character.h"
+#include "../match-engine/daos/match-states.h"
+#include "../match-engine/daos/sa.h"
+#include "../match-engine/daos/shot.h"
+#include "../state-machine/states/states.h"
 #include <algorithm>
 #include <cstdint>
 #include <string>
@@ -244,6 +246,7 @@ public:
   bool is_ftue_match = false;
 
   std::vector<EventMessage> message_buffer;
+  MatchStateMachine* stateMachine;
 
   bool has_reconnecting_client() {
     if (users[home].connectionState == ConnectionState::Reconnecting ||

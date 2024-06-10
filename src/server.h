@@ -20,9 +20,9 @@
 
 #include "config.h"
 
-#include "match-engine/daos/match-model.h"
-
 #include "gameloop/gameloop.h"
+
+#include "state-machine/state-machine.h"
 
 #include "match-engine/configs/match-engine-config.h"
 

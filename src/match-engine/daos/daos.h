@@ -1,6 +1,6 @@
 #pragma once
 
-#include "match-model.h"
+#include "../../match-manager/match-model.h"
 
 
 struct ProbabilityCalculationDAO {

@@ -79,6 +79,7 @@ void GameLoop::Update() {
         return em.processed;
     }), message_queue.end());
 
+    MatchManager::getInstance()->updateMatches(&pb);
     // Logger::printProgress(MatchManager::getInstance()->m_matches.size(), 100);
 }
 

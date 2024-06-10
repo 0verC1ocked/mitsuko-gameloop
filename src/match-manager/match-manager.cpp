@@ -210,3 +210,10 @@ bool MatchManager::pushIntoMatch(const std::string& serialized_data, const std::
     }
     
 }
+
+void MatchManager::updateMatches(PayloadBuilder *pb) {
+
+    for (auto& match : m_matches) {
+        match.second->stateMachine->emp(match.second);
+    }
+}
