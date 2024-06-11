@@ -224,9 +224,3 @@ struct Reconnecting {
 
   MatchStates getState() { return MatchStates::Reconnecting; };
 };
-
-
-template <typename... States>
-class StateMachine;
-
-using MatchStateMachine = StateMachine<NoState, WaitingForUsers, WaitingForMatchReady, StartInnings, PlayerSelection, StartBall, BallSelection, ShotSelection, Outcome, EndBall, EndOver, EndInnings, MatchEnded, Reconnecting>;

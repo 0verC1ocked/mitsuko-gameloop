@@ -6,7 +6,6 @@
 #include "conditions.h"
 #include "states/states.h"
 #include "../utils/logger/logger.h"
-#include "../match-manager/match-model.h"
 #include <chrono>
 
 // Define a base class for all states
@@ -73,7 +72,6 @@ public:
     };
 
     void preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
-        Logger::Log(DEBUG, "StateMachine::preUpdate ");
         auto executeOnCall = [this, &condition, &match_model, &pb](auto currentState) {
             currentState->preUpdate(condition, match_model, pb);
         };
@@ -81,14 +79,12 @@ public:
     };
 
     void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
-        Logger::Log(DEBUG, "StateMachine::onUpdate ");
         std::visit([this, &condition, &match_model, &pb](auto currentState) {
                 return currentState->onUpdate(condition, match_model, pb);
         }, m_currentState);
     };
 
     void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
-        Logger::Log(DEBUG, "StateMachine::postUpdate ");
         auto executeOnCall = [this, &condition, &match_model, &pb](auto currentState) {
             currentState->postUpdate(condition, match_model, pb);
         };
@@ -110,5 +106,4 @@ public:
 
 // NOTE: should follow match state sequence
 
-
-
+using MatchStateMachine = StateMachine<NoState, WaitingForUsers, WaitingForMatchReady, StartInnings, PlayerSelection, StartBall, BallSelection, ShotSelection, Outcome, EndBall, EndOver, EndInnings, MatchEnded, Reconnecting>;

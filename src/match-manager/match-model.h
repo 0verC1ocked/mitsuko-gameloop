@@ -12,7 +12,7 @@
 #include "../match-engine/daos/match-states.h"
 #include "../match-engine/daos/sa.h"
 #include "../match-engine/daos/shot.h"
-#include "../state-machine/states/states.h"
+#include "../state-machine/state-machine.h"
 #include <algorithm>
 #include <cstdint>
 #include <string>
@@ -246,7 +246,7 @@ public:
   bool is_ftue_match = false;
 
   std::vector<EventMessage> message_buffer;
-  MatchStateMachine* stateMachine;
+  MatchStateMachine stateMachine;
 
   bool has_reconnecting_client() {
     if (users[home].connectionState == ConnectionState::Reconnecting ||

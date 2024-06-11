@@ -186,9 +186,8 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
 
 bool MatchManager::pushIntoMatch(const std::string& serialized_data, const std::string& matchId) {
     try {
-
         if (matchId.empty()) {
-            Logger::Log(ERROR, "Match ID is empty");
+            Logger::Log(ERROR, "Match ID is empty!");
             return false;
         }
 
@@ -198,7 +197,7 @@ bool MatchManager::pushIntoMatch(const std::string& serialized_data, const std::
         if (it != m_matches.end()) {
             match = it->second.get();
         } else {
-            Logger::Log(ERROR, "Match not found");
+            Logger::Log(ERROR, "Match not found!");
             return false;
         }
 
@@ -212,8 +211,13 @@ bool MatchManager::pushIntoMatch(const std::string& serialized_data, const std::
 }
 
 void MatchManager::updateMatches(PayloadBuilder *pb) {
-
+    if (m_matches.empty()) {
+        return;
+    }
     for (auto& match : m_matches) {
-        match.second->stateMachine->emp(match.second);
+        if (match.second == nullptr) {
+            continue;
+        }
+        match.second->stateMachine.update(match.second);
     }
 }
