@@ -45,7 +45,7 @@ $(BUILD_DIR):
 
 # Rule to build each static library
 define build_static_lib
-	$(MAKE) -C $(1) release
+	+$(MAKE) -C $(1) release
 endef
 
 $(DEPS_LIBS):
