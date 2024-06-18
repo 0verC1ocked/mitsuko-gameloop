@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../../../lib/payloadbuilder/inc/payload-builder.h"
-#include "../../match-engine/configs/timeouts.h"
-#include "../../match-engine/daos/match-states.h"
+#include "../timeouts.h"
 #include "../conditions.h"
+#include "../match-states.h"
 
 class MatchModel;
 

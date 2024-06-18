@@ -5,7 +5,7 @@
 #include <vector>
 #include <chrono>
 #include "../../inc/zmq.hpp"
-#include "../match-engine/daos/event-message.h"
+#include "../../lib/matchengine/src/daos/event-message.h"
 
 class GameLoop {
 public:

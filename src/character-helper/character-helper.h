@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "../match-engine/daos/character.h"
+#include "../../lib/matchengine/src/daos/character.h"
 
 class CharacterHelper {
     public:

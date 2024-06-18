@@ -24,7 +24,7 @@ DEPS := $(OBJS:.o=.d)
 
 LDFLAGS := $(foreach dir,$(SUBMODULE_DIRS),-L$(dir)/build -l$(notdir $(dir)))
 
-CPPFLAGS := $(INC_FLAGS) -MMD -MP
+CPPFLAGS := -I$(INC_DIR) -MMD -MP
 CXXFLAGS += -std=c++17 -w # Add -g flag for debug information
 
 debug: CXXFLAGS += -g -ggdb3
@@ -37,19 +37,15 @@ sanitize: $(BUILD_DIR)/$(EXECUTABLE)
 release: CXXFLAGS += -O3 -fsanitize=address
 release: $(DEPS_LIBS) $(BUILD_DIR)/$(EXECUTABLE)
 
-releasedb: CXXFLAGS += -g -ggdb3 -O3 -fsanitize=address
+releasedb: CXXFLAGS += -g -ggdb3 -O3
 releasedb: $(BUILD_DIR)/$(EXECUTABLE)
 
 $(BUILD_DIR):
 	mkdir -p $@
 
 # Rule to build each static library
-define build_static_lib
-	+$(MAKE) -C $(1) release
-endef
-
 $(DEPS_LIBS):
-	$(foreach dir,$(SUBMODULE_DIRS),$(call build_static_lib,$(dir)))
+	./build_submodules.sh
 
 $(BUILD_DIR)/$(EXECUTABLE): $(PCH) $(OBJS) $(DEPS_LIBS) | $(BUILD_DIR)
 	@echo "Linking..."
@@ -65,7 +61,7 @@ $(OBJ_DIR)/%.cc.o: %.cc
 	mkdir -p $(dir $@)
 	clang++ $(CPPFLAGS) $(CXXFLAGS) -I $(INC_DIR) -I $(SRC_DIR) -c $< -o $@
 
-$(PCH): $(HEADERS) $(PCH_FILENAME)
+$(PCH): $(HEADERS)
 	@echo "Building Precompiled Header..."
 	clang++ $(CXXFLAGS) -I $(INC_DIR) -I $(SRC_DIR) -x c++-header $(PCH_FILENAME)
 
@@ -75,9 +71,11 @@ clean:
 cleanall:
 	rm -r $(BUILD_DIR)
 	$(foreach dir,$(SUBMODULE_DIRS), \
-		echo "Cleaning $(dir)"; \
-		cd $(dir); \
-		$(MAKE) -C $(dir) clean; \
+		if [ -d $(dir) ]; then \
+			$(MAKE) -C $(dir) clean; \
+		else \
+			echo "Directory $(dir) does not exist."; \
+		fi \
 	)
 
 cleandocs:

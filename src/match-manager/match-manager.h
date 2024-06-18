@@ -3,9 +3,10 @@
 #include <string>
 #include <unordered_map>
 #include "match-model.h"
-#include "../match-engine/daos/passive.h"
+#include "../../lib/matchengine/src/daos/passive.h"
 #include "../../lib/payloadbuilder/src/proto/match.pb.h"
-#include "../match-engine/daos/prop.h"
+#include "../../lib/matchengine/src/daos/prop.h"
+#include "../../lib/matchengine/src/daos/ball.h"
 
 class MatchManager {
     private:

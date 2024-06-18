@@ -24,16 +24,14 @@
 
 #include "state-machine/state-machine.h"
 
-#include "match-engine/configs/match-engine-config.h"
-
 #include "memory/pool-allocator.h"
 
 #include "match-manager/match-manager.h"
 
 #include "character-helper/character-helper.h"
 
-#include "match-engine/match-engine.h"
-
 #include "utils/functions/functions.h"
 
 #include "event-handler/event-handler.h"
+
+#include "../lib/matchengine/inc/match-engine.h"
