@@ -4,7 +4,7 @@
 #include "../memory/pool-allocator.h"
 #include "../../lib/matchengine/inc/match-engine-config.h"
 #include "../state-machine/timeouts.h"
-#include "../../lib/matchengine/src/daos/event-message.h"
+#include "event-message.h"
 #include "../../lib/matchengine/src/daos/ball.h"
 #include "../../lib/matchengine/src/daos/bot.h"
 #include "../../lib/matchengine/src/daos/bracket.h"
