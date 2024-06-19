@@ -53,7 +53,7 @@ void GameLoop::Update() {
                 break;
             }
             case IPC::IPCMessageType::IPC_P1_MATCH_REQUEST: { // Push into its own buffer
-                MatchManager::getInstance()->pushIntoMatch(ipcMessage->data(), ipcMessage->matchid());
+                MatchManager::getInstance()->pushIntoMatchBuffers(ipcMessage->data(), ipcMessage->matchid());
                 break;
             }
             default:
@@ -69,8 +69,8 @@ void GameLoop::Update() {
         bool processed = EventHandler::getEventHandlerInstance()->handleEvent(pb, payload);
         em.processed = processed;
 
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - em.created_at).count() > 7) {
-            Logger::Log(ERROR, "Message has expired!");
+        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - em.created_at).count() > 7) {
+            Logger::Log(ERROR, "GameLoop::main() -> Message has expired!");
             em.processed = true;
         }
     }

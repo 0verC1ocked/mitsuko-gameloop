@@ -10,10 +10,10 @@ void StartBall::onUpdate(TransitionalCondition &condition, const std::shared_ptr
 void StartBall::postUpdate(TransitionalCondition& condition, const std::shared_ptr<MatchModel> &matchModel, PayloadBuilder* payloadBuilder) {
 }
 
-void StartBall::autoPlay() {
+void StartBall::autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb){
 
 }
 
-void StartBall::botPlay() {
+void StartBall::botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb){
 
 }

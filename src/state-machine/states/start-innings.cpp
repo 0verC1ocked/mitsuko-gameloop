@@ -9,10 +9,10 @@ void StartInnings::onUpdate(TransitionalCondition &condition, const std::shared_
 void StartInnings::postUpdate(TransitionalCondition& condition, const std::shared_ptr<MatchModel> &matchModel, PayloadBuilder* payloadBuilder) {
 }
 
-void StartInnings::autoPlay() {
+void StartInnings::autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb){
 
 }
 
-void StartInnings::botPlay() {
+void StartInnings::botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb){
 
 }

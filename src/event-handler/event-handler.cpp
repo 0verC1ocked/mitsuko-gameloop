@@ -15,13 +15,22 @@ bool EventHandler::handleEvent(PayloadBuilder& pb, PAYLOAD::Payload* received_pa
     switch (received_payload->event()) {
         case PAYLOAD::Events::CONNECT_ACK: {
             std::shared_ptr<MatchModel> match;
-            auto it = MatchManager::getInstance()->m_matches.find(received_payload->data().roomid());
-            if (it != MatchManager::getInstance()->m_matches.end()) {
-                match = it->second;
+            auto match_it = MatchManager::getInstance()->m_matches.find(received_payload->data().roomid());
+            if (match_it != MatchManager::getInstance()->m_matches.end()) {
+                match = match_it->second;
             } else {
                 return false;
             }
-            if (match->users[received_payload->data().userid()].connectionState == ConnectionState::NotConnected) {
+
+            auto user_it = match->users.find(received_payload->data().userid());
+            UserInfo* user = nullptr;
+            if (user_it != match->users.end()) {
+                user = &user_it->second;
+            } else {
+                return false;
+            }
+
+            if (user->connectionState == ConnectionState::NotConnected) {
                 PAYLOAD::Payload* payload = pb.newPayload();
                 pb.setEvent(PAYLOAD::Events::CONNECTED)
                     .setRoomId(received_payload->data().roomid())
@@ -36,7 +45,7 @@ bool EventHandler::handleEvent(PayloadBuilder& pb, PAYLOAD::Payload* received_pa
                 ipcMessage->set_data(payload->SerializeAsString());
                 GameLoop::getGameLoopInstance()->queueData(ipcMessage->SerializeAsString());
                 return true;
-            } else if (match->users[received_payload->data().userid()].connectionState == ConnectionState::Disconnected) {
+            } else if (user->connectionState == ConnectionState::Disconnected) {
             }
            break;
         }

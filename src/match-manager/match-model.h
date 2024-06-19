@@ -327,12 +327,30 @@ public:
 
   bool isStateExpired() { return remainingStateSeconds() <= 0; }
 
+  bool checkIfUserIdBelongsToThisMatch(const std::string& uid) {
+      return (uid == home || uid == away);
+  }
+
   int64_t remainingStateSeconds() {
     return std::max(0L,
                     getStateTimeout() -
                         std::chrono::duration_cast<std::chrono::seconds>(
                             std::chrono::system_clock::now() - stateStartTime)
                             .count());
+  }
+
+  bool reachedCancelTimeout() {
+    if (joinState == JoinStates::NoJoins) {
+      return std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now() - created_at)
+        .count() >= FIRST_JOIN_TIMEOUT_SECONDS;
+    } else if (joinState == JoinStates::FirstJoin) {
+      return std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now() - first_join_at)
+        .count() >= SECOND_JOIN_TIMEOUT_SECONDS;
+    } else {
+      return false;
+    }
   }
 
   bool is_stale() {
@@ -355,6 +373,13 @@ public:
     } else {
       return false;
     }
+  }
+
+  void removeProcessedMessages() {
+    message_buffer.erase(
+        std::remove_if(message_buffer.begin(), message_buffer.end(),
+                       [](const EventMessage& em) { return em.processed; }),
+        message_buffer.end());
   }
 
   bool is_home_bot() { return users[home].is_bot; }

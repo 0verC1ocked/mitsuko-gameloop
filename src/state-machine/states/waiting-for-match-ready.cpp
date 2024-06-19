@@ -11,10 +11,10 @@ void WaitingForMatchReady::onUpdate(TransitionalCondition &condition, const std:
 void WaitingForMatchReady::postUpdate(TransitionalCondition& condition, const std::shared_ptr<MatchModel> &matchModel, PayloadBuilder* payloadBuilder) {
 }
 
-void WaitingForMatchReady::autoPlay() {
+void WaitingForMatchReady::autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
 
 }
 
-void WaitingForMatchReady::botPlay() {
+void WaitingForMatchReady::botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
 
 }

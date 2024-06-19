@@ -18,7 +18,7 @@ class MatchManager {
         static std::unique_ptr<Player> _dummy_player;
         void createMatch(const MATCH::CreateMatchRequest* request);
         void unpackPlayer(const PAYLOAD::Player& payloadPlayer, Player& player);
-        bool pushIntoMatch(const std::string& serialized_data, const std::string& match_id);
+        bool pushIntoMatchBuffers(const std::string& serialized_data, const std::string& match_id);
 
         void updateMatches(PayloadBuilder *pb);
         

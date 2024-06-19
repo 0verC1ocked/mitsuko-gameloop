@@ -10,10 +10,10 @@ void ShotSelection::onUpdate(TransitionalCondition &condition, const std::shared
 void ShotSelection::postUpdate(TransitionalCondition& condition, const std::shared_ptr<MatchModel> &matchModel, PayloadBuilder* payloadBuilder) {
 }
 
-void ShotSelection::autoPlay() {
+void ShotSelection::autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
 
 }
 
-void ShotSelection::botPlay() {
+void ShotSelection::botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
 
 }

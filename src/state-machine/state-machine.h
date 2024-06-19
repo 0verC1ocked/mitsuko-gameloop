@@ -91,12 +91,11 @@ public:
         std::visit(executeOnCall, m_currentState);
     };
 
-    void update(const std::shared_ptr<MatchModel>& match_model) {
-        PayloadBuilder pb;
+    void update(const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
         TransitionalCondition condition = TransitionalCondition::NoConditionsMet;
-        preUpdate(condition, match_model, &pb);
-        onUpdate(condition, match_model, &pb);
-        postUpdate(condition, match_model, &pb);
+        preUpdate(condition, match_model, pb);
+        onUpdate(condition, match_model, pb);
+        postUpdate(condition, match_model, pb);
     };
 
     void emp(const std::shared_ptr<MatchModel>& match_model) {

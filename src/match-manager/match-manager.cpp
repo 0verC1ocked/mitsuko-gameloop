@@ -182,9 +182,10 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
 
     m_matches.emplace(match->matchId, std::shared_ptr<MatchModel>(match));
     Logger::Log(DEBUG, "Match created with ID: " + match->matchId);
+    Logger::Log(DEBUG, "Users count in the match: " + std::to_string(match->users.size()));
 }
 
-bool MatchManager::pushIntoMatch(const std::string& serialized_data, const std::string& matchId) {
+bool MatchManager::pushIntoMatchBuffers(const std::string& serialized_data, const std::string& matchId) {
     try {
         if (matchId.empty()) {
             Logger::Log(ERROR, "Match ID is empty!");
@@ -201,7 +202,7 @@ bool MatchManager::pushIntoMatch(const std::string& serialized_data, const std::
             return false;
         }
 
-        match->message_buffer.push_back(serialized_data);
+        match->message_buffer.push_back(EventMessage { serialized_data });
         return true;
     } catch (const std::exception& e) {
         Logger::Log(ERROR, "Encountered some issue with pushin data into buffer");
@@ -218,6 +219,6 @@ void MatchManager::updateMatches(PayloadBuilder *pb) {
         if (match.second == nullptr) {
             continue;
         }
-        match.second->stateMachine.update(match.second);
+        match.second->stateMachine.update(match.second, pb);
     }
 }

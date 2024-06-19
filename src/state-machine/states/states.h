@@ -17,8 +17,10 @@ struct NoState {
                 PayloadBuilder *pb) {};
   void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                   PayloadBuilder *pb) {};
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb) {};
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb) {};
 
   MatchStates getState() { return MatchStates::NoState; };
 };
@@ -30,8 +32,10 @@ struct WaitingForUsers {
   void preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                   PayloadBuilder *pb);
@@ -48,8 +52,10 @@ struct WaitingForMatchReady {
   void preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                   PayloadBuilder *pb);
@@ -66,8 +72,10 @@ struct StartInnings {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::StartInnings; };
 };
@@ -83,8 +91,10 @@ struct PlayerSelection {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::PlayerSelection; };
 };
@@ -98,8 +108,10 @@ struct StartBall {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::StartBall; };
 };
@@ -113,8 +125,10 @@ struct BallSelection {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::BallSelection; };
 };
@@ -128,8 +142,10 @@ struct ShotSelection {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::ShotSelection; };
 };
@@ -143,8 +159,10 @@ struct Outcome {
                 PayloadBuilder *pb);
   void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                   PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
   MatchStates getState() { return MatchStates::Outcome; };
 };
 
@@ -159,8 +177,10 @@ struct EndBall {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::EndBall; };
 };
@@ -174,8 +194,10 @@ struct EndOver {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::EndOver; };
 };
@@ -189,8 +211,10 @@ struct EndInnings {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::EndInnings; };
 };
@@ -204,8 +228,10 @@ struct MatchEnded {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::MatchEnded; };
 };
@@ -219,8 +245,10 @@ struct Reconnecting {
                   PayloadBuilder *pb);
   void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
                 PayloadBuilder *pb);
-  void autoPlay();
-  void botPlay();
+  void autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
+  void botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model,
+                PayloadBuilder *pb);
 
   MatchStates getState() { return MatchStates::Reconnecting; };
 };

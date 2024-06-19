@@ -10,10 +10,10 @@ void EndOver::onUpdate(TransitionalCondition &condition, const std::shared_ptr<M
 void EndOver::postUpdate(TransitionalCondition& condition, const std::shared_ptr<MatchModel> &matchModel, PayloadBuilder* payloadBuilder) {
 } 
 
-void EndOver::autoPlay() {
+void EndOver::autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
 
 }
 
-void EndOver::botPlay() {
+void EndOver::botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
 
 }
