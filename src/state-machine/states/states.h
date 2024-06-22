@@ -23,6 +23,8 @@ struct NoState {
                 PayloadBuilder *pb) {};
 
   MatchStates getState() { return MatchStates::NoState; };
+
+  void handleP0Events(const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb);
 };
 
 struct WaitingForUsers {
