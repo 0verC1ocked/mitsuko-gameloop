@@ -71,27 +71,27 @@ public:
         return m_previousState.index();
     };
 
-    void preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
+    void preUpdate(TransitionalCondition &condition, MatchModel &match_model, ArenaAllocator &allocator) {
         auto executeOnCall = [this, &condition, &match_model, &allocator](auto currentState) {
             currentState->preUpdate(condition, match_model, allocator);
         };
         std::visit(executeOnCall, m_currentState);
     };
 
-    void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
+    void onUpdate(TransitionalCondition &condition, MatchModel &match_model, ArenaAllocator &allocator) {
         std::visit([this, &condition, &match_model, &allocator](auto currentState) {
                 return currentState->onUpdate(condition, match_model, allocator);
         }, m_currentState);
     };
 
-    void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
+    void postUpdate(TransitionalCondition &condition, MatchModel &match_model, ArenaAllocator &allocator) {
         auto executeOnCall = [this, &condition, &match_model, &allocator](auto currentState) {
             currentState->postUpdate(condition, match_model, allocator);
         };
         std::visit(executeOnCall, m_currentState);
     };
 
-    void update(const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
+    void update(MatchModel &match_model, ArenaAllocator &allocator) {
         TransitionalCondition condition = TransitionalCondition::NoConditionsMet;
         preUpdate(condition, match_model, allocator);
         onUpdate(condition, match_model, allocator);

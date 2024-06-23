@@ -220,6 +220,6 @@ void MatchManager::updateMatches(ArenaAllocator &allocator) {
         if (match.second == nullptr) {
             continue;
         }
-        match.second->stateMachine.update(match.second, allocator);
+        match.second->stateMachine.update(*match.second.get(), allocator);
     }
 }
