@@ -6,9 +6,9 @@ else
     echo "Directory lib/matchengine does not exist."
 fi
 
-if [ -d lib/payloadbuilder ]; then
-    make -C lib/payloadbuilder release
+if [ -d lib/arenaallocator ]; then
+    make -C lib/arenaallocator release
 else
-    echo "Directory lib/payloadbuilder does not exist."
+    echo "Directory lib/arenaallocator does not exist."
 fi
 

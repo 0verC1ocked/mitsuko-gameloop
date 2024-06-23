@@ -49,7 +49,7 @@ void MatchManager::unpackPlayer(const PAYLOAD::Player& payloadPlayer, Player& pl
 
 void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
 
-    MatchModel* match = new (__FILE__, __LINE__)MatchModel();
+    MatchModel* match = new (__FILE__, __LINE__) MatchModel();
 
     std::string home_id = request->homeuserid();
     std::string away_id = request->awayuserid();
@@ -181,6 +181,7 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
     match->is_ftue_match = isFtueMatch;
 
     m_matches.emplace(match->matchId, std::shared_ptr<MatchModel>(match));
+
     Logger::Log(DEBUG, "Match created with ID: " + match->matchId);
     Logger::Log(DEBUG, "Users count in the match: " + std::to_string(match->users.size()));
 }
@@ -211,7 +212,7 @@ bool MatchManager::pushIntoMatchBuffers(const std::string& serialized_data, cons
     
 }
 
-void MatchManager::updateMatches(PayloadBuilder *pb) {
+void MatchManager::updateMatches(ArenaAllocator &allocator) {
     if (m_matches.empty()) {
         return;
     }
@@ -219,6 +220,6 @@ void MatchManager::updateMatches(PayloadBuilder *pb) {
         if (match.second == nullptr) {
             continue;
         }
-        match.second->stateMachine.update(match.second, pb);
+        match.second->stateMachine.update(match.second, allocator);
     }
 }

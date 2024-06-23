@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "match-model.h"
 #include "../../lib/matchengine/src/daos/passive.h"
-#include "../../lib/payloadbuilder/src/proto/match.pb.h"
+#include "../../lib/arenaallocator/src/proto/match.pb.h"
 #include "../../lib/matchengine/src/daos/prop.h"
 #include "../../lib/matchengine/src/daos/ball.h"
 
@@ -20,7 +20,7 @@ class MatchManager {
         void unpackPlayer(const PAYLOAD::Player& payloadPlayer, Player& player);
         bool pushIntoMatchBuffers(const std::string& serialized_data, const std::string& match_id);
 
-        void updateMatches(PayloadBuilder *pb);
+        void updateMatches(ArenaAllocator &allocator);
         
         // Unordered map from string to MatchModel pointers
         std::unordered_map<std::string, std::shared_ptr<MatchModel>> m_matches;

@@ -14,9 +14,9 @@
 
 #include "utils/logger/logger.h"
 
-#include "../lib/payloadbuilder/inc/payload-builder.h"
+    #include "../lib/arenaallocator/inc/arena-allocator.h"
 
-#include "../lib/payloadbuilder/src/proto/payload.pb.h"
+#include "../lib/arenaallocator/src/proto/payload.pb.h"
 
 #include "config.h"
 

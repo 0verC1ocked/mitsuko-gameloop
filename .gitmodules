@@ -2,3 +2,6 @@
 [submodule "lib/arenaallocator"]
 	path = lib/arenaallocator
 	url = git@github.com:0verC1ocked/arenaallocator.git
+[submodule "lib/matchengine"]
+	path = lib/matchengine
+	url = git@github.com:0verC1ocked/match-engine.git

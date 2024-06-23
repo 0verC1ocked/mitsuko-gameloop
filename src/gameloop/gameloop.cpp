@@ -33,21 +33,21 @@ void GameLoop::Start() {
 }
 
 void GameLoop::Update() {
-    PayloadBuilder pb;
+    ArenaAllocator allocator;
     for (const zmq::message_t& msg : read_buffer) {
-        IPC::IPCMessage* ipcMessage = pb.newIPCMessage();
+        IPC::IPCMessage* ipcMessage = allocator.newIPCMessage();
         ipcMessage->ParseFromArray(msg.data(), msg.size());
         
         Logger::Log(DEBUG, "Received message: " + ipcMessage->ShortDebugString());
         switch (ipcMessage->type()) {
             case IPC::IPCMessageType::IPC_CREATE_MATCH_REQUEST: {
-                MATCH::CreateMatchRequest* createMatchRequest = pb.newCreateMatchRequest();
+                MATCH::CreateMatchRequest* createMatchRequest = allocator.newCreateMatchRequest();
                 createMatchRequest->ParseFromString(ipcMessage->data());
                 MatchManager::getInstance()->createMatch(createMatchRequest);
                 break;
             }
             case IPC::IPCMessageType::IPC_P0_MATCH_REQUEST: { // Push into its own buffer
-                PAYLOAD::Payload* payload = pb.newPayload();
+                PAYLOAD::Payload* payload = allocator.newPayload();
                 payload->ParseFromString(ipcMessage->data());
                 message_queue.push_back(EventMessage{ payload->SerializeAsString() });
                 break;
@@ -64,9 +64,9 @@ void GameLoop::Update() {
     read_buffer.clear();
 
     for (EventMessage& em : message_queue) {
-        PAYLOAD::Payload* payload = pb.newPayload();
+        PAYLOAD::Payload* payload = allocator.newPayload();
         payload->ParseFromString(em.message);
-        bool processed = EventHandler::getEventHandlerInstance()->handleEvent(pb, payload);
+        bool processed = EventHandler::getEventHandlerInstance()->handleEvent(allocator, payload);
         em.processed = processed;
 
         if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - em.created_at).count() > 7) {
@@ -79,7 +79,7 @@ void GameLoop::Update() {
         return em.processed;
     }), message_queue.end());
 
-    MatchManager::getInstance()->updateMatches(&pb);
+    MatchManager::getInstance()->updateMatches(allocator);
     // Logger::printProgress(MatchManager::getInstance()->m_matches.size(), 100);
 }
 

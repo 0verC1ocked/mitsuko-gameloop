@@ -1,6 +1,6 @@
 #pragma once
-#include "../../lib/payloadbuilder/src/proto/payload.pb.h"
-#include "../../lib/payloadbuilder/inc/payload-builder.h"
+#include "../../lib/arenaallocator/src/proto/payload.pb.h"
+#include "../../lib/arenaallocator/inc/arena-allocator.h"
 class EventHandler {
     private:
         EventHandler();
@@ -9,5 +9,5 @@ class EventHandler {
         static EventHandler* getEventHandlerInstance() noexcept;
         ~EventHandler();
 
-        bool handleEvent(PayloadBuilder &pb, PAYLOAD::Payload* payload);
+        bool handleEvent(ArenaAllocator &allocator, PAYLOAD::Payload* payload);
 };

@@ -71,35 +71,31 @@ public:
         return m_previousState.index();
     };
 
-    void preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
-        auto executeOnCall = [this, &condition, &match_model, &pb](auto currentState) {
-            currentState->preUpdate(condition, match_model, pb);
+    void preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
+        auto executeOnCall = [this, &condition, &match_model, &allocator](auto currentState) {
+            currentState->preUpdate(condition, match_model, allocator);
         };
         std::visit(executeOnCall, m_currentState);
     };
 
-    void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
-        std::visit([this, &condition, &match_model, &pb](auto currentState) {
-                return currentState->onUpdate(condition, match_model, pb);
+    void onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
+        std::visit([this, &condition, &match_model, &allocator](auto currentState) {
+                return currentState->onUpdate(condition, match_model, allocator);
         }, m_currentState);
     };
 
-    void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
-        auto executeOnCall = [this, &condition, &match_model, &pb](auto currentState) {
-            currentState->postUpdate(condition, match_model, pb);
+    void postUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
+        auto executeOnCall = [this, &condition, &match_model, &allocator](auto currentState) {
+            currentState->postUpdate(condition, match_model, allocator);
         };
         std::visit(executeOnCall, m_currentState);
     };
 
-    void update(const std::shared_ptr<MatchModel>& match_model, PayloadBuilder *pb) {
+    void update(const std::shared_ptr<MatchModel>& match_model, ArenaAllocator &allocator) {
         TransitionalCondition condition = TransitionalCondition::NoConditionsMet;
-        preUpdate(condition, match_model, pb);
-        onUpdate(condition, match_model, pb);
-        postUpdate(condition, match_model, pb);
-    };
-
-    void emp(const std::shared_ptr<MatchModel>& match_model) {
-        Logger::Log(DEBUG, "StateMachine::emp ");
+        preUpdate(condition, match_model, allocator);
+        onUpdate(condition, match_model, allocator);
+        postUpdate(condition, match_model, allocator);
     };
 };
 

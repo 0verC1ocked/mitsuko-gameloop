@@ -1,12 +1,12 @@
 #include "../../server.h"
 
-void WaitingForUsers::preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder* payloadBuilder) {
+void WaitingForUsers::preUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, ArenaAllocator &allocator) {
     if (match_model->has_any_bot_client()) {
-        botPlay(condition, match_model, payloadBuilder);
+        botPlay(condition, match_model, allocator);
     }
 }
 
-void WaitingForUsers::onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder* payloadBuilder) {
+void WaitingForUsers::onUpdate(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, ArenaAllocator &allocator) {
     try {
         if (match_model->reachedCancelTimeout()) {
             if (match_model->joinState == JoinStates::NoJoins) {
@@ -34,7 +34,7 @@ void WaitingForUsers::onUpdate(TransitionalCondition &condition, const std::shar
             Logger::Log(ERROR,"[" + match_model->matchId + "] WaitingForUsers::onUpdate " + "Message has expired!");
             em.processed = true;
         }
-        PAYLOAD::Payload* payload = payloadBuilder->newPayload();
+        PAYLOAD::Payload* payload = allocator.newPayload();
         payload->ParseFromString(em.message);
         if (match_model->checkIfUserIdBelongsToThisMatch(payload->data().userid())) {
             if (match_model->joinState == JoinStates::NoJoins) {
@@ -63,17 +63,16 @@ void WaitingForUsers::onUpdate(TransitionalCondition &condition, const std::shar
 
 }
 
-void WaitingForUsers::postUpdate(TransitionalCondition& condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder* payloadBuilder) {
+void WaitingForUsers::postUpdate(TransitionalCondition& condition, const std::shared_ptr<MatchModel> &match_model, ArenaAllocator &allocator) {
     try {
         if (match_model->joinState == JoinStates::SecondJoin && condition == TransitionalCondition::BothUsersJoined) {
             for (auto& u : match_model->users) {
-                PAYLOAD::Payload* payload = payloadBuilder->newPayload();
-                payloadBuilder->setEvent(PAYLOAD::Events::MATCH_READY);
-                payloadBuilder->setTeam(match_model->home == u.first ? PAYLOAD::TeamPosition::HOME_TEAM : PAYLOAD::AWAY_TEAM);
-                payloadBuilder->build(payload);
+                PAYLOAD::Payload* payload = allocator.newPayload();
+                payload->set_event(PAYLOAD::Events::MATCH_READY);
+                payload->set_for_team(match_model->home == u.first ? PAYLOAD::TeamPosition::HOME_TEAM : PAYLOAD::AWAY_TEAM);
                 std::string serializedData = payload->SerializeAsString();
                 if (u.second.canSendPacket()) {
-                    IPC::IPCMessage* ipcMessage = payloadBuilder->newIPCMessage();
+                    IPC::IPCMessage* ipcMessage = allocator.newIPCMessage();
                     ipcMessage->set_type(IPC::IPCMessageType::IPC_ENET_SEND);
                     ipcMessage->set_userid(u.first);
                     ipcMessage->set_data(payload->SerializeAsString());
@@ -92,11 +91,11 @@ void WaitingForUsers::postUpdate(TransitionalCondition& condition, const std::sh
     }
 }
 
-void WaitingForUsers::autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
+void WaitingForUsers::autoPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, ArenaAllocator &allocator) {
 
 }
 
-void WaitingForUsers::botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, PayloadBuilder *pb) {
+void WaitingForUsers::botPlay(TransitionalCondition &condition, const std::shared_ptr<MatchModel> &match_model, ArenaAllocator &allocator) {
     std::string bot_team;
     std::string real_team;
     if (match_model->is_home_bot()) {
@@ -111,13 +110,12 @@ void WaitingForUsers::botPlay(TransitionalCondition &condition, const std::share
     if (!match_model->users[bot_team].auto_play) {
         match_model->users[bot_team].setConnectionState(ConnectionState::Connected);
     
-        PAYLOAD::Payload* payload = pb->newPayload();
-
-        pb->setEvent(PAYLOAD::Events::JOINED_MATCH);
-        pb->setRoomId(match_model->matchId);
-        pb->setUserId(bot_team);
-        pb->setOpponentId(real_team);
-        pb->build(payload);
+        PAYLOAD::Payload* payload = allocator.newPayload();
+        payload->set_event(PAYLOAD::Events::JOINED_MATCH);
+        payload->mutable_data()->set_userid(bot_team);
+        payload->mutable_data()->set_opponentid(real_team);
+        payload->mutable_data()->set_roomid(match_model->matchId);
+        
         Logger::Log(NOTICE, "Bot joined the match");
         
         match_model->message_buffer.push_back(EventMessage { payload->SerializeAsString() });

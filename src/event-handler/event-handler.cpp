@@ -11,7 +11,7 @@ EventHandler* EventHandler::getEventHandlerInstance() noexcept {
 
 EventHandler::EventHandler() { }
 
-bool EventHandler::handleEvent(PayloadBuilder& pb, PAYLOAD::Payload* received_payload) {
+bool EventHandler::handleEvent(ArenaAllocator& allocator, PAYLOAD::Payload* received_payload) {
     switch (received_payload->event()) {
         case PAYLOAD::Events::CONNECT_ACK: {
             std::shared_ptr<MatchModel> match;
@@ -31,15 +31,14 @@ bool EventHandler::handleEvent(PayloadBuilder& pb, PAYLOAD::Payload* received_pa
             }
 
             if (user->connectionState == ConnectionState::NotConnected) {
-                PAYLOAD::Payload* payload = pb.newPayload();
-                pb.setEvent(PAYLOAD::Events::CONNECTED)
-                    .setRoomId(received_payload->data().roomid())
-                    .setUserId(received_payload->data().userid())
-                    .setOpponentId(received_payload->data().opponentid())
-                    .build(payload);
+                PAYLOAD::Payload* payload = allocator.newPayload();
+                payload->set_event(PAYLOAD::Events::CONNECTED);
+                payload->mutable_data()->set_roomid(received_payload->data().roomid());
+                payload->mutable_data()->set_userid(received_payload->data().userid());
+                payload->mutable_data()->set_opponentid(received_payload->data().opponentid());
                 
                 match->users[received_payload->data().userid()].connectionState = ConnectionState::Connected;
-                IPC::IPCMessage* ipcMessage = pb.newIPCMessage();
+                IPC::IPCMessage* ipcMessage = allocator.newIPCMessage();
                 ipcMessage->set_type(IPC::IPCMessageType::IPC_ENET_SEND);
                 ipcMessage->set_userid(received_payload->data().userid());
                 ipcMessage->set_data(payload->SerializeAsString());

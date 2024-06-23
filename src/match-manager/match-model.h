@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../lib/payloadbuilder/src/proto/payload.pb.h"
+#include "../../lib/arenaallocator/src/proto/payload.pb.h"
 #include "../memory/pool-allocator.h"
 #include "../../lib/matchengine/inc/match-engine-config.h"
 #include "../state-machine/timeouts.h"
@@ -407,11 +407,14 @@ public:
   void *operator new(size_t size, const char *file, int line) {
     g_match_model_allocator->number_of_allocs++;
     return g_match_model_allocator->allocate(size);
-    // return malloc(size);
   }
 
   void operator delete(void *ptr, size_t size) {
     g_match_model_allocator->number_of_deallocs++;
     return g_match_model_allocator->deallocate(ptr, size);
+  }
+
+  static void CustomMatchModelDeleter(MatchModel *mm) {
+    mm->delete_match_model(__FILE__, __LINE__);
   }
 };
