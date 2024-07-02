@@ -19,6 +19,10 @@
 
 enum struct PlayStates { MatchMaked, Ready, Bowling, Batting, Forfiet, Crash };
 
+enum struct UserState { Spectate, Onstrike, Offstrike, Bowling };
+
+enum struct Team { NoTeam, Home, Away };
+
 enum struct ConnectionState {
   NotConnected,
   Connected,
@@ -108,6 +112,8 @@ struct PreviousBallDTO {
 
 struct UserInfo {
   PlayStates playState;
+  UserState userState = UserState::Spectate;
+  Team team;
   ConnectionState connectionState;
   std::string opponentUID;
   ACK ack;
@@ -212,7 +218,7 @@ struct PlayersOnPitch {
 };
 
 class MatchModel {
-public:
+private:
   MatchModel() {
     home_lineup.reserve(11);
     away_lineup.reserve(11);
@@ -229,8 +235,8 @@ public:
   std::vector<Player> away_lineup;
   CurrentBall currentBall;
   std::vector<CurrentBall> previousBalls = {{}, {}, {}};
-  std::unique_ptr<Player> selectedFirstBatsman;
-  std::unique_ptr<Player> selectedSecondBatsman;
+  std::unique_ptr<Player> onStrikeBatsman;
+  std::unique_ptr<Player> offStrikeBatsman;
   std::unique_ptr<Player> selectedBowler;
   std::chrono::high_resolution_clock::time_point stateStartTime;
   std::chrono::high_resolution_clock::time_point both_disconnect_time_point;
@@ -247,6 +253,72 @@ public:
 
   std::vector<EventMessage> message_buffer;
   MatchStateMachine stateMachine;
+
+public:
+
+  //#region getters
+  std::string getMatchId() { return matchId; }
+  std::unordered_map<std::string, UserInfo> getUsers() { return users; }
+  std::string  getHome() { return home; }
+  std::string  getAway() { return away; }
+  JoinStates getJoinState() { return joinState; }
+  MatchStates getMatchState() { return matchState; }
+  Innings getCurrentInnings() { return currentInnings; }
+  Innings getPreviousInnings() { return previousInnings; }
+  std::vector<Player> getHomeLineup() { return home_lineup; }
+  std::vector<Player> getAwayLineup() { return away_lineup; }
+  CurrentBall getCurrentBall() { return currentBall; }
+  std::vector<CurrentBall> getPreviousBalls() { return previousBalls; }
+  std::unique_ptr<Player> getOnStrikeBatsman() { return onStrikeBatsman; }
+  std::unique_ptr<Player> getOffStrikeBatsman() { return offStrikeBatsman; }
+  std::unique_ptr<Player> getSelectedBowler() { return selectedBowler; }
+  std::chrono::high_resolution_clock::time_point getStateStartTime() { return stateStartTime; }
+  std::chrono::high_resolution_clock::time_point getBothDisconnectTimePoint() { return both_disconnect_time_point; }
+  std::string getWinner() { return winner; }
+  bool getIsRpsEnabled() { return is_rps_enabled; }
+  bool getIsPassivesEnabled() { return is_passives_enabled; }
+  int getBatsmanManaRequired() { return batsman_mana_required; }
+  int getBowlerManaRequired() { return bowler_mana_required; }
+  std::chrono::high_resolution_clock::time_point getCreatedAt() { return created_at; }
+  std::chrono::high_resolution_clock::time_point getFirstJoinAt() { return first_join_at; }
+  std::chrono::high_resolution_clock::time_point getSecondJoinAt() { return second_join_at; }
+  bool getCanceled() { return canceled; }
+  bool getIsFtueMatch() { return is_ftue_match; }
+  std::vector<EventMessage> getMessageBuffer() { return message_buffer; }
+  MatchStateMachine getStateMachine() { return stateMachine; }
+  //#endregion getters
+
+  //#region setters
+  void setMatchId(std::string matchId) { this->matchId = matchId; }
+  void setUser(std::unordered_map<std::string, UserInfo> user) { this->users.emplace(user); }
+  void setHome(std::string home) { this->home = home; }
+  void setAway(std::string away) { this->away = away; }
+  void setJoinState(JoinStates joinState) { this->joinState = joinState; }
+  void setMatchState(MatchStates matchState) { this->matchState = matchState; }
+  void setCurrentInnings(Innings currentInnings) { this->currentInnings = currentInnings; }
+  void setPreviousInnings(Innings previousInnings) { this->previousInnings = previousInnings; }
+  void setHomeLineup(std::vector<Player> home_lineup) { this->home_lineup = home_lineup; }
+  void setAwayLineup(std::vector<Player> away_lineup) { this->away_lineup = away_lineup; }
+  void setCurrentBall(CurrentBall currentBall) { this->currentBall = currentBall; }
+  void setPreviousBalls(std::vector<CurrentBall> previousBalls) { this->previousBalls = previousBalls; }
+  void setOnStrikeBatsman(std::unique_ptr<Player> onStrikeBatsman) { this->onStrikeBatsman = std::move(onStrikeBatsman); }
+  void setOffStrikeBatsman(std::unique_ptr<Player> offStrikeBatsman) { this->offStrikeBatsman = std::move(offStrikeBatsman); }
+  void setSelectedBowler(std::unique_ptr<Player> selectedBowler) { this->selectedBowler = std::move(selectedBowler); }
+  void setStateStartTime(std::chrono::high_resolution_clock::time_point stateStartTime) { this->stateStartTime = stateStartTime; }
+  void setBothDisconnectTimePoint(std::chrono::high_resolution_clock::time_point both_disconnect_time_point) { this->both_disconnect_time_point = both_disconnect_time_point; }
+  void setWinner(std::string winner) { this->winner = winner; }
+  void setIsRpsEnabled(bool is_rps_enabled) { this->is_rps_enabled = is_rps_enabled; }
+  void setIsPassivesEnabled(bool is_passives_enabled) { this->is_passives_enabled = is_passives_enabled; }
+  void setBatsmanManaRequired(int batsman_mana_required) { this->batsman_mana_required = batsman_mana_required; }
+  void setBowlerManaRequired(int bowler_mana_required) { this->bowler_mana_required = bowler_mana_required; }
+  void setCreatedAt(std::chrono::high_resolution_clock::time_point created_at) { this->created_at = created_at; }
+  void setFirstJoinAt(std::chrono::high_resolution_clock::time_point first_join_at) { this->first_join_at = first_join_at; }
+  void setSecondJoinAt(std::chrono::high_resolution_clock::time_point second_join_at) { this->second_join_at = second_join_at; }
+  void setCanceled(bool canceled) { this->canceled = canceled; }
+  void setIsFtueMatch(bool is_ftue_match) { this->is_ftue_match = is_ftue_match; }
+  void setMessageBuffer(std::vector<EventMessage> message_buffer) { this->message_buffer = message_buffer; }
+  void setStateMachine(MatchStateMachine stateMachine) { this->stateMachine = stateMachine; }
+  //#endregion setters
 
   bool has_reconnecting_client() {
     if (users[home].connectionState == ConnectionState::Reconnecting ||

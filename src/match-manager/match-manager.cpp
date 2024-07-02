@@ -92,28 +92,33 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
         user_on_bowling = home_id;
     }
 
+    std::vector<Player> home_lineup;
+    std::vector<Player> away_lineup;
 
     auto home_players = request->home_lineup();
     for (int i = 0; i < home_players.size(); i++) {
         Player player;
         MatchManager::unpackPlayer(request->home_lineup(i), player);
-        match->home_lineup.push_back(player);
+        home_lineup.push_back(player);
     }
+    match->setHomeLineup(home_lineup);
 
     auto away_players = request->away_lineup();
     for (int i = 0; i < away_players.size(); i++) {
         Player player;
         MatchManager::unpackPlayer(request->away_lineup(i), player);
-        match->away_lineup.push_back(player);
+        away_lineup.push_back(player);
     }
+    match->setAwayLineup(away_lineup);
 
     BallDistributionForInningsDAO m_bD = BallDistributionForInningsDAO { 0, 0, 0 };
     MatchEngine::getEngine()->get_ball_distribution_for_innings(m_bD, number_of_overs);
 
-    match->matchId = request->matchid();
-    match->created_at = std::chrono::high_resolution_clock::now();
-    
-    match->users.emplace(home_id, UserInfo {
+    match->setMatchId(request->matchid());
+    match->.setCreatedAt(std::chrono::high_resolution_clock::now());
+
+    std::unordered_map<std::string, UserInfo> homeUserInfo;
+    homeUserInfo.emplace(home_id, UserInfo {
         home_play_state,
         ConnectionState::NotConnected,
         away_id,
@@ -123,7 +128,10 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
         isHomeBot,
         homeBotProfile
     });
-    match->users.emplace(away_id, UserInfo {
+    match->setUser(homeUserInfo);
+
+    std::unordered_map<std::string, UserInfo> awayUserInfo;
+    awayUserInfo.emplace(away_id, UserInfo {
         away_play_state,
         ConnectionState::NotConnected,
         home_id,
@@ -133,11 +141,13 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
         isAwayBot,
         awayBotProfile
     });
-    match->home = home_id;
-    match->away = away_id;
-    match->joinState = JoinStates::NoJoins;
-    match->matchState = MatchStates::WaitingForUsers;
-    match->currentInnings = Innings{
+    match->setUser(awayUserInfo);
+
+    match->setHome(home_id);
+    match->setAway(away_id);
+    match->setJoinState(JoinStates::None);
+    match->setMatchState(MatchStates::WaitingForUsers);
+    match->setCurrentInnings(Innings{
         Inning::First,
         0,
         0,
@@ -153,37 +163,36 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
         m_bD.number_of_red_balls,
         user_on_batting,
         user_on_bowling
-    };
-    match->previousInnings = match->currentInnings;
-    match->currentBall = CurrentBall{
+    });
+    match->setPreviousInnings(match->currentInnings);
+    match->setCurrentBall(CurrentBall{
         BallStates::None,
         {},
-        {},
+        {
+            { 0, "None", 0, Brackets::Zero, 0.0f, 0.0f, 0.0, 0.0 },
+            { 0, "None", 0, Brackets::One, 0.0f, 0.0f, 0.0, 0.0 },
+            { 0, "None", 0, Brackets::Two, 0.0f, 0.0f, 0.0, 0.0 },
+            { 0, "None", 0, Brackets::Four, 0.0f, 0.0f, 0.0, 0.0 },
+            { 0, "None", 0, Brackets::Six, 0.0f, 0.0f, 0.0, 0.0 }
+        },
         {},
         {},
         {},
         0,
-    };
-    match->selectedFirstBatsman = MatchManager::dummyPlayer();
-    match->selectedSecondBatsman = MatchManager::dummyPlayer();
-    match->selectedBowler = MatchManager::dummyPlayer();
-    match->currentBall.shots = {
-    { 0, "None", 0, Brackets::Zero, 0.0f, 0.0f, 0.0, 0.0 },
-    { 0, "None", 0, Brackets::One, 0.0f, 0.0f, 0.0, 0.0 },
-    { 0, "None", 0, Brackets::Two, 0.0f, 0.0f, 0.0, 0.0 },
-    { 0, "None", 0, Brackets::Four, 0.0f, 0.0f, 0.0, 0.0 },
-    { 0, "None", 0, Brackets::Six, 0.0f, 0.0f, 0.0, 0.0 },
-    };
-    match->is_rps_enabled = is_rps_enabled;
-    match->is_passives_enabled = is_passives_enabled;
-    match->batsman_mana_required = batsman_mana_required;
-    match->bowler_mana_required = bowler_mana_required;
-    match->is_ftue_match = isFtueMatch;
+    });
+    match->setOnStrikeBatsman(MatchManager::dummyPlayer());
+    match->setOffStrikeBatsman(MatchManager::dummyPlayer());
+    match->setSelectedBowler(MatchManager::dummyPlayer());
+    match->setIsRpsEnabled(is_rps_enabled);
+    match->setIsPassivesEnabled(is_passives_enabled);
+    match->setBatsmanManaRequired(batsman_mana_required);
+    match->setBowlerManaRequired(bowler_mana_required);
+    match->setIsFtueMatch(isFtueMatch);
 
-    m_matches.emplace(match->matchId, std::shared_ptr<MatchModel>(match));
+    m_matches.emplace(match->getMatchId(), std::shared_ptr<MatchModel>(match));
 
-    Logger::Log(DEBUG, "Match created with ID: " + match->matchId);
-    Logger::Log(DEBUG, "Users count in the match: " + std::to_string(match->users.size()));
+    Logger::Log(DEBUG, "Match created with ID: " + match->getMatchId());
+    Logger::Log(DEBUG, "Users count in the match: " + std::to_string(match->getUsers().size()));
 }
 
 bool MatchManager::pushIntoMatchBuffers(const std::string& serialized_data, const std::string& matchId) {
