@@ -14,8 +14,8 @@ class MatchManager {
         MatchManager();
     public: 
         static MatchManager* getInstance();
-        static std::unique_ptr<Player> dummyPlayer();
-        static std::unique_ptr<Player> _dummy_player;
+        static std::shared_ptr<Player> dummyPlayer();
+        static std::shared_ptr<Player> _dummy_player;
         void createMatch(const MATCH::CreateMatchRequest* request);
         void unpackPlayer(const PAYLOAD::Player& payloadPlayer, Player& player);
         bool pushIntoMatchBuffers(const std::string& serialized_data, const std::string& match_id);

@@ -11,9 +11,9 @@ MatchManager* MatchManager::getInstance() {
 
 MatchManager::MatchManager() { }
 
-std::unique_ptr<Player> MatchManager::_dummy_player = nullptr;
+std::shared_ptr<Player> MatchManager::_dummy_player = nullptr;
 
-std::unique_ptr<Player> MatchManager::dummyPlayer() {
+std::shared_ptr<Player> MatchManager::dummyPlayer() {
     if (_dummy_player == nullptr) {
         _dummy_player = std::make_unique<Player>();
     }
@@ -115,11 +115,13 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
     MatchEngine::getEngine()->get_ball_distribution_for_innings(m_bD, number_of_overs);
 
     match->setMatchId(request->matchid());
-    match->.setCreatedAt(std::chrono::high_resolution_clock::now());
+    match->setCreatedAt(std::chrono::high_resolution_clock::now());
 
     std::unordered_map<std::string, UserInfo> homeUserInfo;
     homeUserInfo.emplace(home_id, UserInfo {
         home_play_state,
+        UserState::Onstrike,
+        Team::Home,
         ConnectionState::NotConnected,
         away_id,
         ACK::None,
@@ -133,6 +135,8 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
     std::unordered_map<std::string, UserInfo> awayUserInfo;
     awayUserInfo.emplace(away_id, UserInfo {
         away_play_state,
+        UserState::Bowling,
+        Team::Away,
         ConnectionState::NotConnected,
         home_id,
         ACK::None,
@@ -145,7 +149,7 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
 
     match->setHome(home_id);
     match->setAway(away_id);
-    match->setJoinState(JoinStates::None);
+    match->setJoinState(JoinStates::NoJoins);
     match->setMatchState(MatchStates::WaitingForUsers);
     match->setCurrentInnings(Innings{
         Inning::First,
@@ -164,7 +168,7 @@ void MatchManager::createMatch(const MATCH::CreateMatchRequest* request) {
         user_on_batting,
         user_on_bowling
     });
-    match->setPreviousInnings(match->currentInnings);
+    match->setPreviousInnings(match->getCurrentInnings());
     match->setCurrentBall(CurrentBall{
         BallStates::None,
         {},
@@ -212,7 +216,7 @@ bool MatchManager::pushIntoMatchBuffers(const std::string& serialized_data, cons
             return false;
         }
 
-        match->message_buffer.push_back(EventMessage { serialized_data });
+        match->getMessageBuffer().push_back(EventMessage { serialized_data });
         return true;
     } catch (const std::exception& e) {
         Logger::Log(ERROR, "Encountered some issue with pushin data into buffer");
@@ -229,6 +233,6 @@ void MatchManager::updateMatches(ArenaAllocator &allocator) {
         if (match.second == nullptr) {
             continue;
         }
-        match.second->stateMachine.update(*match.second.get(), allocator);
+        match.second->getStateMachine().update(*match.second.get(), allocator);
     }
 }

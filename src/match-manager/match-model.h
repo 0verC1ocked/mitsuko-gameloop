@@ -219,10 +219,6 @@ struct PlayersOnPitch {
 
 class MatchModel {
 private:
-  MatchModel() {
-    home_lineup.reserve(11);
-    away_lineup.reserve(11);
-  }
   std::string matchId;
   std::unordered_map<std::string, UserInfo> users;
   std::string home;
@@ -235,9 +231,9 @@ private:
   std::vector<Player> away_lineup;
   CurrentBall currentBall;
   std::vector<CurrentBall> previousBalls = {{}, {}, {}};
-  std::unique_ptr<Player> onStrikeBatsman;
-  std::unique_ptr<Player> offStrikeBatsman;
-  std::unique_ptr<Player> selectedBowler;
+  std::shared_ptr<Player> onStrikeBatsman;
+  std::shared_ptr<Player> offStrikeBatsman;
+  std::shared_ptr<Player> selectedBowler;
   std::chrono::high_resolution_clock::time_point stateStartTime;
   std::chrono::high_resolution_clock::time_point both_disconnect_time_point;
   std::string winner = "";
@@ -256,6 +252,11 @@ private:
 
 public:
 
+  MatchModel() {
+    home_lineup.reserve(11);
+    away_lineup.reserve(11);
+  }
+
   //#region getters
   std::string getMatchId() { return matchId; }
   std::unordered_map<std::string, UserInfo> getUsers() { return users; }
@@ -269,9 +270,9 @@ public:
   std::vector<Player> getAwayLineup() { return away_lineup; }
   CurrentBall getCurrentBall() { return currentBall; }
   std::vector<CurrentBall> getPreviousBalls() { return previousBalls; }
-  std::unique_ptr<Player> getOnStrikeBatsman() { return onStrikeBatsman; }
-  std::unique_ptr<Player> getOffStrikeBatsman() { return offStrikeBatsman; }
-  std::unique_ptr<Player> getSelectedBowler() { return selectedBowler; }
+  std::shared_ptr<Player> getOnStrikeBatsman() { return onStrikeBatsman; }
+  std::shared_ptr<Player> getOffStrikeBatsman() { return offStrikeBatsman; }
+  std::shared_ptr<Player> getSelectedBowler() { return selectedBowler; }
   std::chrono::high_resolution_clock::time_point getStateStartTime() { return stateStartTime; }
   std::chrono::high_resolution_clock::time_point getBothDisconnectTimePoint() { return both_disconnect_time_point; }
   std::string getWinner() { return winner; }
@@ -301,9 +302,9 @@ public:
   void setAwayLineup(std::vector<Player> away_lineup) { this->away_lineup = away_lineup; }
   void setCurrentBall(CurrentBall currentBall) { this->currentBall = currentBall; }
   void setPreviousBalls(std::vector<CurrentBall> previousBalls) { this->previousBalls = previousBalls; }
-  void setOnStrikeBatsman(std::unique_ptr<Player> onStrikeBatsman) { this->onStrikeBatsman = std::move(onStrikeBatsman); }
-  void setOffStrikeBatsman(std::unique_ptr<Player> offStrikeBatsman) { this->offStrikeBatsman = std::move(offStrikeBatsman); }
-  void setSelectedBowler(std::unique_ptr<Player> selectedBowler) { this->selectedBowler = std::move(selectedBowler); }
+  void setOnStrikeBatsman(std::shared_ptr<Player> onStrikeBatsman) { this->onStrikeBatsman = std::move(onStrikeBatsman); }
+  void setOffStrikeBatsman(std::shared_ptr<Player> offStrikeBatsman) { this->offStrikeBatsman = std::move(offStrikeBatsman); }
+  void setSelectedBowler(std::shared_ptr<Player> selectedBowler) { this->selectedBowler = std::move(selectedBowler); }
   void setStateStartTime(std::chrono::high_resolution_clock::time_point stateStartTime) { this->stateStartTime = stateStartTime; }
   void setBothDisconnectTimePoint(std::chrono::high_resolution_clock::time_point both_disconnect_time_point) { this->both_disconnect_time_point = both_disconnect_time_point; }
   void setWinner(std::string winner) { this->winner = winner; }
@@ -319,6 +320,8 @@ public:
   void setMessageBuffer(std::vector<EventMessage> message_buffer) { this->message_buffer = message_buffer; }
   void setStateMachine(MatchStateMachine stateMachine) { this->stateMachine = stateMachine; }
   //#endregion setters
+
+  
 
   bool has_reconnecting_client() {
     if (users[home].connectionState == ConnectionState::Reconnecting ||
